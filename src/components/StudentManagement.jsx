@@ -1,19 +1,25 @@
 import { useState, useEffect } from "react";
-import Button from "react-bootstrap/Button";
-import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Table from "react-bootstrap/Table";
-import Modal from "react-bootstrap/Modal";
-import OutlineButton from "./CommonLayout/OutlineButton.jsx";
-import { FormControl, InputGroup } from "react-bootstrap";
+import { 
+  Button, 
+  Col, 
+  Form, 
+  Row, 
+  Table, 
+  Modal, 
+  FormControl, 
+  InputGroup, 
+  Container, 
+  Card, 
+  Badge 
+} from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const StudentManagement = () => {
-  const [show, setShow] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
+  const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
@@ -47,7 +53,7 @@ const StudentManagement = () => {
         dateOfBirth: "2005-05-15",
         gender: "Male",
         email: "david@gmail.com",
-        address: "123 Main StP",
+        address: "123 Main St",
       },
       {
         id: 2,
@@ -63,7 +69,7 @@ const StudentManagement = () => {
         dateOfBirth: "2005-05-15",
         gender: "Female",
         email: "emily@gmail.com",
-        address: "123 Main StP",
+        address: "123 Main St",
       },
       {
         id: 3,
@@ -79,17 +85,26 @@ const StudentManagement = () => {
         dateOfBirth: "2005-05-15",
         gender: "Male",
         email: "aiden@gmail.com",
-        address: "123 Main StP",
+        address: "123 Main St",
       },
     ]);
   }, []);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => {setShow(true);clearData();};
+  const handleClose = () => {
+    setShowModal(false);
+    setIsEditMode(false);
+  };
+  
+  const handleShow = () => {
+    clearData();
+    setIsEditMode(false);
+    setShowModal(true);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  
   const clearData = () => {
     setFormData({
       firstName: "",
@@ -107,6 +122,7 @@ const StudentManagement = () => {
       email: "",
     });
   };
+  
   const viewStudentDetails = (student) => {
     setFormData({
       firstName: student.firstName,
@@ -123,33 +139,36 @@ const StudentManagement = () => {
       address: student.address,
       email: student.email,
     });
-    setShow(true);
+    setIsEditMode(true);
+    setShowModal(true);
   };
+  
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    if (isEditMode) {
+      // Handle updating existing student
+      // This would need to be implemented
+      handleClose();
+      return;
+    }
+    
     const newStudent = {
       id: students.length + 1,
       ...formData,
+      dateOfBirth: formData.dob,
       admissionNumber: `CPS2025${String(students.length + 1).padStart(3, "0")}`,
     };
 
     setStudents([...students, newStudent]);
-    setFormData({
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      admissionNumber: "",
-      rollNumber: "",
-      dob: "",
-      gender: "",
-      class: "",
-      section: "",
-      parentName: "",
-      contactNumber: "",
-      address: "",
-      email: "",
-    });
+    clearData();
     handleClose();
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this student?")) {
+      setStudents(students.filter(student => student.id !== id));
+    }
   };
 
   // Filter students based on search and class filter
@@ -157,9 +176,7 @@ const StudentManagement = () => {
     const matchesSearch =
       student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.admissionNumber
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
+      student.admissionNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.rollNumber.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesClass =
@@ -169,116 +186,137 @@ const StudentManagement = () => {
   });
 
   return (
-    <div
-      className="container-fluid mt-4 p-3 border rounded"
-      style={{ background: "#80808036" }}
-    >
-      <Row className="align-items-center mb-4">
-        <Col xs={12} md={8}>
-          <h2>Student Management</h2>
-        </Col>
-        <Col xs={12} md={4} className="d-flex justify-content-end">
-          <OutlineButton
-            variant="primary"
-            onClick={handleShow}
-            ButtonName={"Add Student"}
-          />
-        </Col>
-      </Row>
+    <Container fluid className="py-4">
+      <Card className="shadow-sm">
+        <Card.Header className="bg-white">
+          <Row className="align-items-center">
+            <Col xs={12} md={8}>
+              <h4 className="mb-0">Student Management</h4>
+            </Col>
+            <Col xs={12} md={4} className="d-flex justify-content-md-end mt-3 mt-md-0">
+              <Button 
+                variant="primary" 
+                onClick={handleShow}
+                className="px-4"
+              >
+                <i className="bi bi-plus"></i> Add Student
+              </Button>
+            </Col>
+          </Row>
+        </Card.Header>
+        <Card.Body>
+          <Row className="mb-4 g-3">
+            <Col md={6} lg={8}>
+              <InputGroup>
+                <InputGroup.Text className="bg-white">
+                  <i className="bi bi-search"></i>
+                </InputGroup.Text>
+                <FormControl
+                  placeholder="Search by name, admission or roll number"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </InputGroup>
+            </Col>
+            <Col md={6} lg={4}>
+              <Form.Select
+                value={selectedClass}
+                onChange={(e) => setSelectedClass(e.target.value)}
+                className="h-100"
+              >
+                <option value="">All Classes</option>
+                <option value="9">Class 9</option>
+                <option value="10">Class 10</option>
+                <option value="11">Class 11</option>
+                <option value="12">Class 12</option>
+              </Form.Select>
+            </Col>
+          </Row>
 
-      <Row className="mb-4">
-        <Col md={6}>
-          <InputGroup>
-            <FormControl
-              placeholder="Search by name, admission or roll number"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </InputGroup>
-        </Col>
-        <Col md={6}>
-          <Form.Select
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-          >
-            <option value="">All Classes</option>
-            <option value="9">Class 9</option>
-            <option value="10">Class 10</option>
-            <option value="11">Class 11</option>
-            <option value="12">Class 12</option>
-          </Form.Select>
-        </Col>
-      </Row>
-
-      <Row>
-        <Col xs={12}>
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                <th>Adm. No.</th>
-                <th>Roll No.</th>
-                <th>Student Name</th>
-                <th>Class</th>
-                <th>Section</th>
-                <th>Parent Name</th>
-                <th>Contact</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredStudents.map((student) => (
-                <tr key={student.id}>
-                  <td>{student.admissionNumber}</td>
-                  <td>{student.rollNumber}</td>
-                  <td>{`${student.firstName} ${
-                    student.middleName ? student.middleName + " " : ""
-                  }${student.lastName}`}</td>
-                  <td>{student.class}</td>
-                  <td>{student.section}</td>
-                  <td>{student.parentName}</td>
-                  <td>{student.contactNumber}</td>
-                  <td>
-                    <Button
-                      variant="info"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => {
-                        viewStudentDetails(student);
-                      }}
-                    >
-                      View
-                    </Button>
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => {
-                        viewStudentDetails(student);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button variant="danger" size="sm">
-                      Delete
-                    </Button>
-                  </td>
+          <div className="table-responsive">
+            <Table hover className="align-middle">
+              <thead className="table-light">
+                <tr>
+                  <th>Adm. No.</th>
+                  <th>Roll No.</th>
+                  <th>Student Name</th>
+                  <th className="d-none d-md-table-cell">Class</th>
+                  <th className="d-none d-md-table-cell">Section</th>
+                  <th className="d-none d-lg-table-cell">Parent Name</th>
+                  <th className="d-none d-lg-table-cell">Contact</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
+              </thead>
+              <tbody>
+                {filteredStudents.length > 0 ? (
+                  filteredStudents.map((student) => (
+                    <tr key={student.id}>
+                      <td>{student.admissionNumber}</td>
+                      <td>{student.rollNumber}</td>
+                      <td>
+                        {`${student.firstName} ${student.middleName ? student.middleName + " " : ""}${student.lastName}`}
+                        <div className="d-md-none mt-1">
+                          <Badge bg="light" text="dark" className="me-1">
+                            Class {student.class}-{student.section}
+                          </Badge>
+                        </div>
+                      </td>
+                      <td className="d-none d-md-table-cell">{student.class}</td>
+                      <td className="d-none d-md-table-cell">{student.section}</td>
+                      <td className="d-none d-lg-table-cell">{student.parentName}</td>
+                      <td className="d-none d-lg-table-cell">{student.contactNumber}</td>
+                      <td>
+                        <div className="d-flex gap-2">
+                          <Button
+                            variant="outline-info"
+                            size="sm"
+                            onClick={() => viewStudentDetails(student)}
+                          >
+                            <i className="bi bi-eye"></i>
+                          </Button>
+                          <Button
+                            variant="outline-warning"
+                            size="sm"
+                            onClick={() => viewStudentDetails(student)}
+                          >
+                            <i className="bi bi-pencil"></i>
+                          </Button>
+                          <Button 
+                            variant="outline-danger" 
+                            size="sm"
+                            onClick={() => handleDelete(student.id)}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="8" className="text-center py-4 text-muted">
+                      No students found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
+        </Card.Body>
+      </Card>
 
-      {/* Add Student Modal */}
-      <Modal show={show} onHide={handleClose} centered size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Add New Student</Modal.Title>
+      {/* Student Modal */}
+      <Modal show={showModal} onHide={handleClose} centered size="lg">
+        <Modal.Header closeButton className="border-0 pb-0">
+          <Modal.Title>
+            {isEditMode ? "Edit Student" : "Add New Student"}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
-            <Row>
+            <Row className="g-3">
               <Col md={4}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>First Name</Form.Label>
                   <Form.Control
                     type="text"
@@ -290,7 +328,7 @@ const StudentManagement = () => {
                 </Form.Group>
               </Col>
               <Col md={4}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>Middle Name</Form.Label>
                   <Form.Control
                     type="text"
@@ -301,7 +339,7 @@ const StudentManagement = () => {
                 </Form.Group>
               </Col>
               <Col md={4}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>Last Name</Form.Label>
                   <Form.Control
                     type="text"
@@ -312,11 +350,9 @@ const StudentManagement = () => {
                   />
                 </Form.Group>
               </Col>
-            </Row>
 
-            <Row>
               <Col md={4}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>Roll Number</Form.Label>
                   <Form.Control
                     type="text"
@@ -328,7 +364,7 @@ const StudentManagement = () => {
                 </Form.Group>
               </Col>
               <Col md={4}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>Date of Birth</Form.Label>
                   <Form.Control
                     type="date"
@@ -340,7 +376,7 @@ const StudentManagement = () => {
                 </Form.Group>
               </Col>
               <Col md={4}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>Gender</Form.Label>
                   <Form.Select
                     name="gender"
@@ -355,11 +391,9 @@ const StudentManagement = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
-            </Row>
 
-            <Row>
               <Col md={6}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>Class</Form.Label>
                   <Form.Select
                     name="class"
@@ -376,7 +410,7 @@ const StudentManagement = () => {
                 </Form.Group>
               </Col>
               <Col md={6}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>Section</Form.Label>
                   <Form.Select
                     name="section"
@@ -391,11 +425,9 @@ const StudentManagement = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
-            </Row>
 
-            <Row>
               <Col md={6}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>Parent/Guardian Name</Form.Label>
                   <Form.Control
                     type="text"
@@ -407,7 +439,7 @@ const StudentManagement = () => {
                 </Form.Group>
               </Col>
               <Col md={6}>
-                <Form.Group className="mb-3">
+                <Form.Group>
                   <Form.Label>Contact Number</Form.Label>
                   <Form.Control
                     type="tel"
@@ -418,43 +450,47 @@ const StudentManagement = () => {
                   />
                 </Form.Group>
               </Col>
+
+              <Col xs={12}>
+                <Form.Group>
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+
+              <Col xs={12}>
+                <Form.Group>
+                  <Form.Label>Address</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={2}
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+              </Col>
             </Row>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Address</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose} name="close">
-                Close
+            <div className="d-flex justify-content-end gap-2 mt-4">
+              <Button variant="light" onClick={handleClose}>
+                Cancel
               </Button>
-              <Button variant="primary" type="submit" name="saveStudent">
-                Add Student
+              <Button variant="primary" type="submit">
+                {isEditMode ? "Update" : "Add"} Student
               </Button>
-            </Modal.Footer>
+            </div>
           </Form>
         </Modal.Body>
       </Modal>
-    </div>
+    </Container>
   );
 };
 

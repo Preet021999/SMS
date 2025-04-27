@@ -1,0 +1,82 @@
+.app-layout {
+    display: flex;
+    height: 100vh;
+    background-color: #f8f9fa;
+  }
+  
+  .main-content {
+    flex: 1;
+    transition: margin-left 0.3s ease;
+    overflow-x: hidden;
+  }
+  
+  .app-header {
+    background-color: #ffffff;
+    height: 70px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .app-title h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 600;
+  }
+  
+  .user-controls {
+    display: flex;
+    align-items: center;
+  }
+  
+  .user-info {
+    margin-right: 1rem;
+    color: #2c3e50;
+    font-weight: 500;
+  }
+  
+  .logout-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .logout-btn:hover {
+    background-color: #2980b9;
+  }
+  
+  .content-area {
+    padding: 1.5rem;
+    height: calc(100vh - 70px);
+    overflow-y: auto;
+  }
+  
+  @media (max-width: 768px) {
+    .app-header {
+      padding: 0 1rem;
+    }
+    
+    .user-info {
+      display: none;
+    }
+    
+    .logout-btn {
+      padding: 0.5rem;
+    }
+    
+    .logout-btn span {
+      display: none;
+    }
+  }

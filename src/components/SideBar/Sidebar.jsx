@@ -1,107 +1,92 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import "./sidebar.css";
-
 import image from "../../assets/react.svg";
 
 const Sidebar = ({ isOpen, onToggle }) => {
-  const [isNotActive, setNotActive] = useState(isOpen); // Initialize based on `isOpen`
-  const [isDropdownActive, setDropdownActive] = useState(false);
-  const barsIcon = <i className="fas fa-bars"></i>;
-  const crossIcon = <i className="fas fa-times-circle"></i>;
+  const [isCollapsed, setIsCollapsed] = useState(isOpen);
+  const location = useLocation();
+
+  // Update local state when props change
+  useEffect(() => {
+    setIsCollapsed(isOpen);
+  }, [isOpen]);
 
   const handleToggle = () => {
-    const newState = !isNotActive;
-    setNotActive(newState);
-    onToggle(newState); // Notify the parent component to update the sidebar state
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    onToggle(newState);
   };
-  const handleOptionClick = () => {
-    setNotActive(true);
-    onToggle(true);
+
+  const handleLinkClick = () => {
+    // Check if we're on mobile by window width
+    if (window.innerWidth <= 768) {
+      // Close sidebar on mobile when link is clicked
+      setIsCollapsed(true);
+      onToggle(true);
+    }
+  };
+
+  const isActiveRoute = (path) => {
+    return location.pathname === path;
   };
 
   return (
-    <div>
-      <div className="wrapper">
-        <nav id="sidebar" className={isNotActive ? "active" : ""}>
-          <button
-            type="button"
-            id="sidebarCollapse"
-            onClick={handleToggle}
-            className=""
-          >
-            <span className={isNotActive ? "" : "hidden"}>{barsIcon}</span>
-            <span className={isNotActive ? "hidden" : ""}>{crossIcon}</span>
-          </button>
-          <div className="sidebar-header">
-            <img
-              src={image}
-              className="rounded-circle usr-image"
-              height={isNotActive ? "20" : "70"}
-              width={isNotActive ? "20" : "70"}
-              alt="User"
-            />
-            <h3 className={isNotActive ? "hidden" : ""}>User Name</h3>
-          </div>
+    <div className="wrapper">
+      <nav id="sidebar" className={isCollapsed ? "active" : ""}>
+        <button
+          type="button"
+          id="sidebarCollapse"
+          onClick={handleToggle}
+          aria-label="Toggle Sidebar"
+        >
+          <i className={isCollapsed ? "fas fa-bars" : "fas fa-times"}></i>
+        </button>
+        
+        <div className="sidebar-header">
+          <img
+            src={image}
+            className="rounded-circle usr-image"
+            height={isCollapsed ? "40" : "60"}
+            width={isCollapsed ? "40" : "60"}
+            alt="User"
+          />
+          <h3 className={isCollapsed ? "hidden" : ""}>Admin</h3>
+        </div>
 
-          <ul className="list-unstyled components">
-            <li className="list-item">
-              <i className="fas fa-briefcase icon-color"></i>
-              <Link to="/dashboard" onClick={handleOptionClick}>Dashboard</Link>
-            </li>
-            <li className="list-item">
-              <i className="fas fa-building icon-color"></i>
-              <Link to="/student-management" onClick={handleOptionClick}>Student Management</Link>
-            </li>
-            <li className="list-item">
-              <i className="fas fa-briefcase icon-color"></i>
-              <Link to="/attendance-management" onClick={handleOptionClick}>Attendance Management</Link>
-            </li>
-            <li className="list-item">
-              <i className="fas fa-building icon-color"></i>
-              <Link to="/result-generation" onClick={handleOptionClick}>Generate Results</Link>
-            </li>
-            <li className="list-item">
-              <i className="fas fa-building icon-color"></i>
-              <Link to="/circular-management" onClick={handleOptionClick}>Manage Circulars</Link>
-            </li>
-            
-{/*             
-            <li className="list-item">
-              <i className="fas fa-user-alt icon-color"></i>
-              <Link
-                to="#"
-                onClick={() => setDropdownActive(!isDropdownActive)}
-                className="dropdown-toggle"
-                
-              >
-                My Space
-              </Link>
-              <ul
-                className={
-                  isDropdownActive
-                    ? "list-unstyled collapse show"
-                    : "list-unstyled collapse"
-                }
-              >
-                <li className="dropdown-item">
-                  <Link to="/portfolio" onClick={handleOptionClick}>Portfolio</Link>
-                </li>
-                <li className="dropdown-item">
-                  <Link to="/personal-details" onClick={handleOptionClick}>Personal Details</Link>
-                </li>
-                <li className="dropdown-item">
-                  <Link to="/additional-info" onClick={handleOptionClick}>Additional Info</Link>
-                </li>
-                <li className="dropdown-item">
-                  <Link to="/personal-background" onClick={handleOptionClick}>Personal Background</Link>
-                </li>
-              </ul>
-            </li>
-            */}
-          </ul>
-        </nav>
-      </div>
+        <ul className="list-unstyled components">
+          <li className={`list-item ${isActiveRoute("/dashboard") ? "active" : ""}`}>
+            <Link to="/dashboard" onClick={handleLinkClick}>
+              <i className="fas fa-tachometer-alt icon-color"></i>
+              <span>Dashboard</span>
+            </Link>
+          </li>
+          <li className={`list-item ${isActiveRoute("/student-management") ? "active" : ""}`}>
+            <Link to="/student-management" onClick={handleLinkClick}>
+              <i className="fas fa-user-graduate icon-color"></i>
+              <span>Students</span>
+            </Link>
+          </li>
+          <li className={`list-item ${isActiveRoute("/attendance-management") ? "active" : ""}`}>
+            <Link to="/attendance-management" onClick={handleLinkClick}>
+              <i className="fas fa-calendar-check icon-color"></i>
+              <span>Attendance</span>
+            </Link>
+          </li>
+          <li className={`list-item ${isActiveRoute("/result-generation") ? "active" : ""}`}>
+            <Link to="/result-generation" onClick={handleLinkClick}>
+              <i className="fas fa-chart-line icon-color"></i>
+              <span>Results</span>
+            </Link>
+          </li>
+          <li className={`list-item ${isActiveRoute("/circular-management") ? "active" : ""}`}>
+            <Link to="/circular-management" onClick={handleLinkClick}>
+              <i className="fas fa-bullhorn icon-color"></i>
+              <span>Circulars</span>
+            </Link>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 };

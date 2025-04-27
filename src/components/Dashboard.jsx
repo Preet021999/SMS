@@ -5,6 +5,8 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Badge from "react-bootstrap/Badge";
 import Table from "react-bootstrap/Table";
+import Spinner from "react-bootstrap/Spinner";
+import Container from "react-bootstrap/Container";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Book, Users, Calendar, Award, Bell, FileText } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -96,68 +98,70 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="container-fluid mt-4 p-3 border rounded text-center" style={{ background: "#80808036" }}>
-        <h3>Loading dashboard...</h3>
-      </div>
+      <Container fluid className="d-flex justify-content-center align-items-center" style={{ minHeight: "80vh" }}>
+        <Spinner animation="border" role="status" variant="primary">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
     );
   }
 
   return (
-    <div className="container-fluid mt-4 p-3 border rounded" style={{ background: "#80808036" }}>
+    <Container fluid className="py-4">
       <Row className="mb-4">
         <Col>
-          <h2>{getGreeting()}, Admin!</h2>
-          <p>Here's an overview of your school management system</p>
+          <h2 className="fw-bold">{getGreeting()}, Admin</h2>
+          <p className="text-muted">School management system overview</p>
         </Col>
       </Row>
 
       {/* Stats Cards */}
-      <Row className="mb-4">
-        <Col md={3}>
-          <Card className="text-center mb-3">
-            <Card.Body>
+      <Row className="mb-4 g-3">
+        <Col xs={12} sm={6} md={3}>
+          <Card className="h-100 shadow-sm border-0">
+            <Card.Body className="text-center">
               <Users size={32} color="#4287f5" className="mb-2" />
-              <h5>Total Students</h5>
-              <h2>{stats.studentCount}</h2>
+              <h6 className="text-muted">TOTAL STUDENTS</h6>
+              <h2 className="fw-bold">{stats.studentCount}</h2>
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
-          <Card className="text-center mb-3">
-            <Card.Body>
+        <Col xs={12} sm={6} md={3}>
+          <Card className="h-100 shadow-sm border-0">
+            <Card.Body className="text-center">
               <Book size={32} color="#42f587" className="mb-2" />
-              <h5>Total Classes</h5>
-              <h2>{stats.classCount}</h2>
+              <h6 className="text-muted">TOTAL CLASSES</h6>
+              <h2 className="fw-bold">{stats.classCount}</h2>
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
-          <Card className="text-center mb-3">
-            <Card.Body>
+        <Col xs={12} sm={6} md={3}>
+          <Card className="h-100 shadow-sm border-0">
+            <Card.Body className="text-center">
               <Users size={32} color="#8742f5" className="mb-2" />
-              <h5>Total Teachers</h5>
-              <h2>{stats.teacherCount}</h2>
+              <h6 className="text-muted">TOTAL TEACHERS</h6>
+              <h2 className="fw-bold">{stats.teacherCount}</h2>
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
-          <Card className="text-center mb-3">
-            <Card.Body>
+        <Col xs={12} sm={6} md={3}>
+          <Card className="h-100 shadow-sm border-0">
+            <Card.Body className="text-center">
               <Calendar size={32} color="#f54275" className="mb-2" />
-              <h5>Attendance Rate</h5>
-              <h2>{stats.attendanceRate}%</h2>
+              <h6 className="text-muted">ATTENDANCE RATE</h6>
+              <h2 className="fw-bold">{stats.attendanceRate}%</h2>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
       {/* Quick Access Feature Cards */}
-      <h4 className="mb-3">Quick Access</h4>
-      <Row className="mb-4">
+      <h5 className="mb-3 fw-bold">Quick Access</h5>
+      <Row className="mb-4 g-3">
         {featureCards.map((card, index) => (
-          <Col key={index} md={3} sm={6}>
+          <Col key={index} xs={12} sm={6} md={3}>
             <Card 
-              className="mb-3" 
+              className="shadow-sm border-0 h-100" 
               style={{ cursor: 'pointer', borderLeft: `4px solid ${card.color}` }}
               onClick={() => handleCardClick(card.route)}
             >
@@ -167,8 +171,8 @@ const Dashboard = () => {
                     {card.icon}
                   </div>
                   <div>
-                    <h5 className="mb-0">{card.title}</h5>
-                    <small>Manage {card.title.toLowerCase()}</small>
+                    <h6 className="mb-0 fw-bold">{card.title}</h6>
+                    <small className="text-muted">Manage {card.title.toLowerCase()}</small>
                   </div>
                 </div>
               </Card.Body>
@@ -177,12 +181,12 @@ const Dashboard = () => {
         ))}
       </Row>
 
-      <Row>
+      <Row className="g-4">
         {/* Attendance Chart */}
-        <Col md={6} className="mb-4">
-          <Card>
-            <Card.Header>
-              <h5 className="mb-0">Monthly Attendance Overview</h5>
+        <Col lg={6} className="mb-4">
+          <Card className="shadow-sm border-0 h-100">
+            <Card.Header className="bg-white border-0 pt-3">
+              <h5 className="mb-0 fw-bold">Monthly Attendance Overview</h5>
             </Card.Header>
             <Card.Body>
               <ResponsiveContainer width="100%" height={250}>
@@ -200,23 +204,25 @@ const Dashboard = () => {
         </Col>
 
         {/* Upcoming Events */}
-        <Col md={6} className="mb-4">
-          <Card>
-            <Card.Header className="d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Upcoming Events</h5>
-              <Badge bg="primary">New</Badge>
+        <Col lg={6} className="mb-4">
+          <Card className="shadow-sm border-0 h-100">
+            <Card.Header className="bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+              <h5 className="mb-0 fw-bold">Upcoming Events</h5>
+              <Badge bg="primary" pill>New</Badge>
             </Card.Header>
-            <Card.Body>
-              <Table hover>
-                <tbody>
-                  {upcomingEvents.map(event => (
-                    <tr key={event.id}>
-                      <td><Calendar size={16} className="me-2" /> {event.title}</td>
-                      <td className="text-end">{formatDate(event.date)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+            <Card.Body className="pb-2">
+              <div className="table-responsive">
+                <Table hover borderless className="align-middle">
+                  <tbody>
+                    {upcomingEvents.map(event => (
+                      <tr key={event.id}>
+                        <td><Calendar size={16} className="me-2 text-primary" /> {event.title}</td>
+                        <td className="text-end text-muted">{formatDate(event.date)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
             </Card.Body>
           </Card>
         </Col>
@@ -224,42 +230,44 @@ const Dashboard = () => {
 
       {/* Recent Activities */}
       <Row>
-        <Col md={12} className="mb-4">
-          <Card>
-            <Card.Header>
-              <h5 className="mb-0">Recent Activities</h5>
+        <Col xs={12} className="mb-4">
+          <Card className="shadow-sm border-0">
+            <Card.Header className="bg-white border-0 pt-3">
+              <h5 className="mb-0 fw-bold">Recent Activities</h5>
             </Card.Header>
-            <Card.Body>
-              <Table hover>
-                <tbody>
-                  {recentActivities.map(activity => (
-                    <tr key={activity.id}>
-                      <td width="70%">
-                        {activity.type === "Result" && <FileText size={16} className="me-2" />}
-                        {activity.type === "Circular" && <Bell size={16} className="me-2" />}
-                        {activity.type === "Student" && <Users size={16} className="me-2" />}
-                        {activity.type === "Attendance" && <Calendar size={16} className="me-2" />}
-                        {activity.title}
-                      </td>
-                      <td>
-                        <Badge bg={
-                          activity.type === "Result" ? "success" :
-                          activity.type === "Circular" ? "info" :
-                          activity.type === "Student" ? "primary" : "warning"
-                        }>
-                          {activity.type}
-                        </Badge>
-                      </td>
-                      <td className="text-end">{formatDate(activity.date)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+            <Card.Body className="pb-2">
+              <div className="table-responsive">
+                <Table hover borderless className="align-middle">
+                  <tbody>
+                    {recentActivities.map(activity => (
+                      <tr key={activity.id}>
+                        <td>
+                          {activity.type === "Result" && <FileText size={16} className="me-2 text-success" />}
+                          {activity.type === "Circular" && <Bell size={16} className="me-2 text-info" />}
+                          {activity.type === "Student" && <Users size={16} className="me-2 text-primary" />}
+                          {activity.type === "Attendance" && <Calendar size={16} className="me-2 text-warning" />}
+                          {activity.title}
+                        </td>
+                        <td>
+                          <Badge pill bg={
+                            activity.type === "Result" ? "success" :
+                            activity.type === "Circular" ? "info" :
+                            activity.type === "Student" ? "primary" : "warning"
+                          }>
+                            {activity.type}
+                          </Badge>
+                        </td>
+                        <td className="text-end text-muted">{formatDate(activity.date)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
             </Card.Body>
           </Card>
         </Col>
       </Row>
-    </div>
+    </Container>
   );
 };
 

@@ -1,21 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "./SideBar/Sidebar";
+import "./layout.css";
 
 const Layout = () => {
   const navigate = useNavigate();
-
-  // State for the sidebar's visibility (default to closed)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   // Check if the user is authenticated
   const isAuthenticated = localStorage.getItem("isAuthenticated");
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isAuthenticated) {
       navigate("/");
     }
-  }, [isAuthenticated, navigate]);
+    
+    // Set initial sidebar state based on screen size
+    setIsSidebarOpen(!isMobile);
+    
+    // Update on resize
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile !== isMobile) {
+        setIsSidebarOpen(!mobile);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isAuthenticated, navigate, isMobile]);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -23,51 +38,36 @@ const Layout = () => {
   };
 
   const handleSidebarToggle = (isOpen) => {
-    setIsSidebarOpen(isOpen); // Update the state based on the sidebar toggle
+    setIsSidebarOpen(isOpen);
   };
 
   return (
-    <div style={{ display: "flex", position: "relative" }}>
-      {/* Sidebar with dynamic open/close */}
+    <div className="app-layout">
       <Sidebar isOpen={isSidebarOpen} onToggle={handleSidebarToggle} />
-
-      {/* Main Content */}
-      <div
-        style={{
-          flex: 1,
-          marginLeft: isSidebarOpen ? "100px" : "300px", // Dynamically adjust content based on sidebar state
-          transition: "margin-left 0.3s ease", // Smooth transition for opening/closing sidebar
-          padding: "20px", // Optional padding for content
+      
+      <div 
+        className="main-content"
+        style={{ 
+          marginLeft: isMobile ? "70px" : (isSidebarOpen ? "70px" : "240px")
         }}
       >
-        <div
-          style={{
-            border: "1px solid #fff", // Border around the div
-            padding: "10px",
-            borderRadius: "10px",
-            background: "#80808036",
-            display: "flex",
-            alignItems: "center", // Align items vertically in the center
-            marginBottom: "20px", // Add margin bottom for spacing
-          }}
-        >
-          <h4 style={{ flex: 1, margin: 0 }}>SMS</h4> {/* This will push the button to the right */}
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#007bff",
-              color: "#fff",
-              icon:"fas fa-sign-out",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Logout
-          </button>
-        </div>
-        <Outlet />
+        <header className="app-header">
+          <div className="app-title">
+            <h4>School Management System</h4>
+          </div>
+          <div className="user-controls">
+            <div className="user-info">
+              <span>Admin</span>
+            </div>
+            <button className="logout-btn" onClick={handleLogout}>
+              <i className="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+        </header>
+        
+        <main className="content-area">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
