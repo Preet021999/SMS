@@ -8,6 +8,7 @@ import AttendanceManagement from "./components/AttendanceManagement.jsx";
 import StudentManagement from "./components/StudentManagement.jsx";
 import ResultGeneration from "./components/ResultGeneration.jsx";
 import CircularManagement from "./components/CircularManagement.jsx";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const App = () => {
   return (
